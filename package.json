@@ -1,0 +1,89 @@
+{
+  "name": "vestywinbox",
+  "version": "1.0.0",
+  "description": "Gestionnaire système Windows moderne avec interface glassmorphism",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "ci": "npm run typecheck && npm run build",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "format": "prettier -w .",
+    "format:check": "prettier -c .",
+    "electron": "set NODE_ENV=development && electron .",
+    "postbuild": "robocopy assets dist/assets /E /NFL /NDL /NJH /NJS /NC /NS /NP",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:simple": "npm run dev & timeout 3 && electron .",
+    "electron:build": "npm run build && electron-builder",
+    "build:exe": "npm run build && electron-builder --win",
+    "build:portable": "npm run build && electron-builder --win portable",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "npm run build && playwright test --config e2e/playwright.config.ts"
+  },
+  "dependencies": {
+    "electron-updater": "^6.2.1",
+    "framer-motion": "^10.16.4",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.1",
+    "react-window": "^1.8.11"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.46.0",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@types/react-window": "^1.8.8",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@vitejs/plugin-react": "^4.1.1",
+    "concurrently": "^8.2.2",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.6.4",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0",
+    "vitest": "^2.0.5",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.vestywinbox.app",
+    "productName": "VestyWinBox",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "asarUnpack": [
+      "assets/Apps portable/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "VestyWinBox"
+    },
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ]
+  }
+}

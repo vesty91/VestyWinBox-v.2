@@ -1,0 +1,42 @@
+# Node / tooling
+node_modules/
+.npm-cache/
+.pnpm-store/
+
+# Vite / Vitest / Playwright
+.vite/
+coverage/
+playwright-report/
+playwright/.cache/
+.ms-playwright/
+*.trace.zip
+trace.zip
+*.log
+
+# Build outputs
+/dist/
+/release/
+
+# Electron builder unpacked artifacts
+release/**/win-unpacked/
+
+# Test artifacts
+/test-results/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Ignore all assets by default (keep only screenshots)
+assets/**
+!assets/screens/
+!assets/screens/**
+
+# App caches and temp
+*.tmp
+*.temp
+.cache/
+
+# IDE
+.vscode/
+.idea/

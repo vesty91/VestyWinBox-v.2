@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Build NSIS and Portable
+        run: |
+          npm run build:exe
+          npm run build:portable
+      - name: Upload NSIS
+        uses: actions/upload-artifact@v4
+        with:
+          name: VestyWinBox-Installer
+          path: release/*.exe
+      - name: Upload Portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: VestyWinBox-Portable
+          path: release/*portable*.exe
+      - name: Publish to GitHub Releases
+        if: env.GH_TOKEN != ''
+        run: npx electron-builder --publish always

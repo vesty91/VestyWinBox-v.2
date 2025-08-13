@@ -1,0 +1,161 @@
+/* Styles pour VIPLayout */
+.vip-layout {
+  min-height: 100vh !important;
+  background: rgba(15, 15, 15, 0.95) !important;
+  color: #ffffff !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.vip-header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1000 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding: 16px 24px !important;
+}
+
+.vip-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 280px !important;
+  height: 100vh !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(20px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+  z-index: 999 !important;
+  padding-top: 80px !important;
+}
+
+.vip-main {
+  padding-top: 80px !important;
+  min-height: calc(100vh - 80px) !important;
+  transition: padding-left 0.3s ease !important;
+}
+
+.vip-main.with-sidebar {
+  padding-left: 280px !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vip-sidebar {
+    width: 100% !important;
+  }
+
+  .vip-main.with-sidebar {
+    padding-left: 0 !important;
+  }
+
+  .vip-header {
+    padding: 12px 16px !important;
+  }
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer-effect {
+  animation: shimmer 2s infinite !important;
+}
+
+/* Thèmes via variables CSS */
+:root[data-theme='dark'] {
+  --bg-primary: rgba(15, 15, 15, 0.95);
+  --header-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-bg: rgba(255, 255, 255, 0.08);
+  --tile-bg: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.2);
+  --border-soft: rgba(255, 255, 255, 0.12);
+  --text-primary: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --icon: #ffffff;
+  --accent: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  --bg-decor:
+    radial-gradient(800px 400px at 20% 0%, rgba(139, 92, 246, 0.18), transparent 60%),
+    radial-gradient(700px 380px at 80% 20%, rgba(16, 185, 129, 0.14), transparent 60%),
+    radial-gradient(600px 320px at 50% 100%, rgba(59, 130, 246, 0.12), transparent 60%);
+}
+
+:root[data-theme='light'] {
+  --bg-primary: #f7f7fb;
+  --header-bg: rgba(255, 255, 255, 0.8);
+  --sidebar-bg: rgba(255, 255, 255, 0.9);
+  --tile-bg: rgba(255, 255, 255, 0.95);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-soft: rgba(0, 0, 0, 0.06);
+  --text-primary: #0f172a;
+  --text-muted: rgba(15, 23, 42, 0.6);
+  --icon: #0f172a;
+  --accent: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  --bg-decor:
+    radial-gradient(800px 400px at 20% 0%, rgba(37, 99, 235, 0.1), transparent 60%),
+    radial-gradient(700px 380px at 80% 20%, rgba(16, 185, 129, 0.1), transparent 60%),
+    radial-gradient(600px 320px at 50% 100%, rgba(59, 130, 246, 0.08), transparent 60%);
+}
+
+:root[data-theme='gold'] {
+  --bg-primary: #1a1405;
+  --header-bg: rgba(255, 215, 0, 0.08);
+  --sidebar-bg: rgba(255, 215, 0, 0.08);
+  --tile-bg: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 215, 0, 0.35);
+  --border-soft: rgba(255, 215, 0, 0.22);
+  --text-primary: #fff8e1;
+  --text-muted: rgba(255, 248, 225, 0.7);
+  --icon: #fff8e1;
+  --accent: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+  --bg-decor:
+    radial-gradient(800px 400px at 20% 0%, rgba(255, 215, 0, 0.18), transparent 60%),
+    radial-gradient(700px 380px at 80% 20%, rgba(255, 165, 0, 0.14), transparent 60%),
+    radial-gradient(600px 320px at 50% 100%, rgba(255, 215, 0, 0.12), transparent 60%);
+}
+
+:root[data-theme='neon'] {
+  --bg-primary: #0c0b20;
+  --header-bg: rgba(139, 92, 246, 0.18);
+  --sidebar-bg: rgba(59, 130, 246, 0.18);
+  --tile-bg: rgba(255, 255, 255, 0.06);
+  --border: rgba(139, 92, 246, 0.4);
+  --border-soft: rgba(59, 130, 246, 0.3);
+  --text-primary: #e9e7ff;
+  --text-muted: rgba(233, 231, 255, 0.7);
+  --icon: #e9e7ff;
+  --accent: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 40%, #06b6d4 100%);
+  --bg-decor:
+    radial-gradient(900px 420px at 20% 0%, rgba(139, 92, 246, 0.3), transparent 60%),
+    radial-gradient(780px 380px at 80% 20%, rgba(59, 130, 246, 0.24), transparent 60%),
+    radial-gradient(660px 340px at 50% 100%, rgba(6, 182, 212, 0.18), transparent 60%);
+}
+
+/* Centrage des titres principaux */
+.vip-main h1,
+.vip-main h2 {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Focus visible (a11y) */
+:where(button, [role='button'], a, input, select, textarea):focus-visible {
+  outline: 2px solid transparent !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.6) !important;
+  border-color: var(--border) !important;
+}
+
+:where(button[disabled], [aria-disabled='true']):focus-visible {
+  box-shadow: none !important;
+}

@@ -1,0 +1,19 @@
+{
+  "appId": "com.vestywinbox.app",
+  "productName": "VestyWinBox",
+  "directories": {
+    "output": "release"
+  },
+  "files": ["dist/**/*", "electron/**/*", "assets/**/*", "node_modules/**/*"],
+  "asarUnpack": ["assets/Apps portable/**/*"],
+  "win": {
+    "target": "nsis"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "VestyWinBox"
+  }
+}
