@@ -1,224 +1,79 @@
-import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Package,
-  Smartphone,
   BarChart3,
-  Settings,
+  Cpu,
   FileText,
   HardDrive,
-  Shield,
-  Zap,
-  Database,
-  Monitor,
-  Heart,
-  Star,
-  TrendingUp,
-  Cpu,
   MemoryStick,
-  LucideIcon,
+  Package,
+  Settings,
+  Smartphone,
 } from 'lucide-react'
-import UnifiedTile from '../../components/UnifiedTile/UnifiedTile'
-import Button from '../../ui/components/Button'
+import React, { useEffect, useState } from 'react'
 import { t } from '../../i18n'
+import Button from '../../ui/components/Button'
 import { surface } from '../../ui/styles/tokens'
 
-interface DashboardTile {
-  id: string
-  title: string
-  description: string
-  icon: LucideIcon
-  gradient: string
-  action: () => void
-  actionText: string
-  actionIcon: LucideIcon
-  status: 'available' | 'installing' | 'installed' | 'launch' | 'info'
-  stats?: {
-    value: string
-    label: string
-    trend?: 'up' | 'down' | 'stable'
-  }
-}
-
 const VIPDashboard: React.FC = () => {
-  const [systemStats, setSystemStats] = useState({
-    cpu: 0,
-    memory: 0,
-    disk: 0,
-    network: 0,
-  })
+  const [systemStats, setSystemStats] = useState({ cpu: 0, memory: 0, disk: 0, network: 0 })
+  const [sysInfo, setSysInfo] = useState<{
+    platform?: string
+    arch?: string
+    version?: string
+    cpuCount?: number
+    cpuModel?: string
+    totalMemory?: number
+    freeMemory?: number
+  } | null>(null)
 
+  // Tirer les stats en temps réel si l'API Electron est dispo, sinon fallback simulé
   useEffect(() => {
-    // Simulation des statistiques système
-    const updateStats = () => {
-      setSystemStats({
-        cpu: Math.floor(Math.random() * 30) + 20,
-        memory: Math.floor(Math.random() * 40) + 30,
-        disk: Math.floor(Math.random() * 20) + 10,
-        network: Math.floor(Math.random() * 50) + 20,
-      })
+    let timer: any
+    const pull = async () => {
+      try {
+        const r = await (window as any).electronAPI?.getRealtimeAnalytics?.()
+        if (r) {
+          setSystemStats({
+            cpu: r.cpu,
+            memory: r.memory,
+            disk: r.disk,
+            network: Math.min(100, Math.round((r.networkKbps || 0) / 10)),
+          })
+          return
+        }
+      } catch {}
+      setSystemStats((prev) => ({
+        cpu: Math.min(100, Math.max(0, prev.cpu + (Math.random() * 10 - 5))),
+        memory: Math.min(100, Math.max(0, prev.memory + (Math.random() * 8 - 4))),
+        disk: Math.min(100, Math.max(0, prev.disk + (Math.random() * 6 - 3))),
+        network: Math.min(100, Math.max(0, prev.network + (Math.random() * 12 - 6))),
+      }))
     }
-
-    updateStats()
-    const interval = setInterval(updateStats, 3000)
-
-    return () => clearInterval(interval)
+    pull()
+    timer = setInterval(pull, 2000)
+    return () => timer && clearInterval(timer)
   }, [])
 
-  const dashboardTiles: DashboardTile[] = [
-    {
-      id: 'software',
-      title: 'Gestion Logiciels',
-      description: 'Installez, mettez à jour et gérez vos applications système.',
-      icon: Package,
-      gradient: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
-      action: () => (window.location.href = '/software'),
-      actionText: 'Gérer',
-      actionIcon: Package,
-      status: 'available',
-      stats: { value: '24', label: 'Logiciels installés' },
-    },
-    {
-      id: 'portable',
-      title: 'Apps Portables',
-      description: 'Lancez vos applications portables sans installation.',
-      icon: Smartphone,
-      gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-      action: () => (window.location.href = '/portable-apps'),
-      actionText: 'Lancer',
-      actionIcon: Smartphone,
-      status: 'launch',
-      stats: { value: '8', label: 'Apps disponibles' },
-    },
-    {
-      id: 'analytics',
-      title: 'Analytics Système',
-      description: "Surveillez les performances et l'utilisation des ressources.",
-      icon: BarChart3,
-      gradient: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
-      action: () => (window.location.href = '/analytics'),
-      actionText: 'Voir',
-      actionIcon: BarChart3,
-      status: 'available',
-      stats: { value: `${systemStats.cpu}%`, label: 'CPU', trend: 'up' },
-    },
-    {
-      id: 'god-mode',
-      title: 'God Mode',
-      description: "Accès avancé aux paramètres système et outils d'administration.",
-      icon: Settings,
-      gradient: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-      action: () => (window.location.href = '/god-mode'),
-      actionText: 'Ouvrir',
-      actionIcon: Settings,
-      status: 'info',
-    },
-    {
-      id: 'converter',
-      title: 'Convertisseur Fichiers',
-      description: 'Convertissez vos fichiers entre différents formats rapidement.',
-      icon: FileText,
-      gradient: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-      action: () => (window.location.href = '/file-converter'),
-      actionText: 'Convertir',
-      actionIcon: FileText,
-      status: 'available',
-    },
-    {
-      id: 'nas',
-      title: 'NAS Explorer',
-      description: 'Explorez et gérez vos serveurs NAS et stockage réseau.',
-      icon: HardDrive,
-      gradient: 'linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)',
-      action: () => (window.location.href = '/nas-explorer'),
-      actionText: 'Explorer',
-      actionIcon: HardDrive,
-      status: 'available',
-    },
-    {
-      id: 'security',
-      title: 'Sécurité Système',
-      description: 'Analysez et renforcez la sécurité de votre système.',
-      icon: Shield,
-      gradient: 'linear-gradient(135deg, #84CC16 0%, #65A30D 100%)',
-      action: () => {},
-      actionText: 'Analyser',
-      actionIcon: Shield,
-      status: 'available',
-      stats: { value: '95%', label: 'Sécurité', trend: 'stable' },
-    },
-    {
-      id: 'optimization',
-      title: 'Optimisation',
-      description: 'Optimisez les performances et nettoyez votre système.',
-      icon: Zap,
-      gradient: 'linear-gradient(135deg, #EC4899 0%, #DB2777 100%)',
-      action: () => {},
-      actionText: 'Optimiser',
-      actionIcon: Zap,
-      status: 'available',
-      stats: { value: `${systemStats.memory}%`, label: 'RAM', trend: 'down' },
-    },
-    {
-      id: 'backup',
-      title: 'Sauvegarde',
-      description: 'Créez et gérez vos sauvegardes système automatiques.',
-      icon: Database,
-      gradient: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
-      action: () => {},
-      actionText: 'Sauvegarder',
-      actionIcon: Database,
-      status: 'available',
-    },
-    {
-      id: 'monitoring',
-      title: 'Monitoring',
-      description: "Surveillez en temps réel l'état de votre système.",
-      icon: Monitor,
-      gradient: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
-      action: () => {},
-      actionText: 'Surveiller',
-      actionIcon: Monitor,
-      status: 'available',
-      stats: { value: `${systemStats.disk}%`, label: 'Disque', trend: 'stable' },
-    },
-    {
-      id: 'health',
-      title: 'Santé Système',
-      description: 'Diagnostiquez et réparez les problèmes système.',
-      icon: Heart,
-      gradient: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)',
-      action: () => {},
-      actionText: 'Diagnostiquer',
-      actionIcon: Heart,
-      status: 'available',
-      stats: { value: 'Excellent', label: 'État', trend: 'up' },
-    },
-    {
-      id: 'favorites',
-      title: 'Favoris',
-      description: 'Accédez rapidement à vos outils et applications préférés.',
-      icon: Star,
-      gradient: 'linear-gradient(135deg, #EAB308 0%, #CA8A04 100%)',
-      action: () => {},
-      actionText: 'Voir',
-      actionIcon: Star,
-      status: 'available',
-      stats: { value: '12', label: 'Favoris' },
-    },
-  ]
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const info = await (window as any).electronAPI?.getSystemInfo?.()
+        if (info) setSysInfo(info)
+      } catch {}
+    })()
+  }, [])
+
+  const prettyGB = (n?: number) => (typeof n === 'number' ? `${n.toFixed(2)} GB` : '—')
+  const formatPct = (n: number) => `${Number(n || 0).toFixed(2)}%`
 
   return (
     <div style={{ minHeight: '100vh' }}>
-      {/* En-tête du Dashboard (refonte) */}
-      <motion.div
-        initial={{ opacity: 0, y: -12 }}
+      {/* En‑tête professionnel */}
+      <motion.section
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
-        style={{
-          marginBottom: '28px',
-          padding: '12px 0',
-        }}
+        style={{ marginBottom: 24 }}
       >
         <div
           style={{
@@ -229,170 +84,302 @@ const VIPDashboard: React.FC = () => {
             flexWrap: 'wrap',
           }}
         >
-          {/* Branding + tagline */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 280 }}>
-            <img
-              src={'/assets/branding/logo.png'}
-              onError={(e) => {
-                ;(e.currentTarget as HTMLImageElement).src = '/assets/branding/logo.jpeg'
+          <div>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: 32,
+                fontWeight: 900,
+                backgroundImage: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                letterSpacing: '-0.02em',
               }}
-              alt="VestyWinBox"
-              style={{ width: 56, height: 56, objectFit: 'contain', borderRadius: 12 }}
-            />
-            <div>
-              <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 0.2 }}>VestyWinBox</div>
-              <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                {t('dashboard_tagline') ||
-                  'Centre de contrôle système • Outils, analytics, portables'}
-              </div>
-            </div>
+            >
+              Bienvenue sur VestyWinBox
+            </h1>
+            <p style={{ margin: '6px 0 0 0', color: 'var(--text-muted)', fontSize: 14 }}>
+              Centre de contrôle système Windows — sobre, rapide, professionnel
+            </p>
           </div>
 
-          {/* Actions rapides */}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = '/settings')}
+              title="Paramètres"
+            >
+              <Settings size={16} />
+              &nbsp;Paramètres
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => (window.location.href = '/software')}
+              style={{
+                background: 'linear-gradient(135deg,#3B82F6 0%, #2563EB 100%)',
+                border: 'none',
+              }}
+            >
+              <Package size={16} />
+              &nbsp;Logiciels
+            </Button>
             <Button
               variant="ghost"
               onClick={() => (window.location.href = '/portable-apps')}
               style={{
-                background: 'linear-gradient(135deg,#10B981 0%,#059669 100%)',
+                background: 'linear-gradient(135deg,#10B981 0%, #059669 100%)',
                 border: 'none',
               }}
             >
-              {t('quick_portable_apps') || 'Apps Portables'}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => (window.location.href = '/god-mode')}
-              style={{
-                background: 'linear-gradient(135deg,#EF4444 0%,#DC2626 100%)',
-                border: 'none',
-              }}
-            >
-              {t('quick_godmode') || 'God Mode'}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => (window.location.href = '/chocolatey')}
-              style={{
-                background: 'linear-gradient(135deg,#3B82F6 0%,#2563EB 100%)',
-                border: 'none',
-              }}
-            >
-              {t('quick_chocolatey') || 'Chocolatey'}
+              <Smartphone size={16} />
+              &nbsp;Apps Portables
             </Button>
             <Button
               variant="ghost"
               onClick={() => (window.location.href = '/file-converter')}
               style={{
-                background: 'linear-gradient(135deg,#F59E0B 0%,#D97706 100%)',
+                background: 'linear-gradient(135deg,#F59E0B 0%, #D97706 100%)',
                 border: 'none',
               }}
             >
-              {t('quick_converter') || 'Convertisseur'}
+              <FileText size={16} />
+              &nbsp;Convertisseur
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => (window.location.href = '/analytics')}
+              style={{
+                background: 'linear-gradient(135deg,#8B5CF6 0%, #7C3AED 100%)',
+                border: 'none',
+              }}
+            >
+              <BarChart3 size={16} />
+              &nbsp;Analytics
             </Button>
           </div>
         </div>
+      </motion.section>
 
-        {/* Cartes métriques sobres */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: 12,
-            marginTop: 16,
-          }}
-        >
-          {[
-            { icon: Cpu, label: 'CPU', value: `${systemStats.cpu}%`, color: '#3B82F6' },
-            { icon: MemoryStick, label: 'RAM', value: `${systemStats.memory}%`, color: '#10B981' },
-            { icon: HardDrive, label: 'Disque', value: `${systemStats.disk}%`, color: '#F59E0B' },
-            {
-              icon: TrendingUp,
-              label: 'Réseau',
-              value: `${systemStats.network}%`,
-              color: '#8B5CF6',
-            },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25, delay: index * 0.05 }}
-              style={{
-                ...surface.muted,
-                padding: 14,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-              }}
-            >
+      {/* Indicateurs clés (sans tuiles) */}
+      <section
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: 12,
+          marginBottom: 20,
+        }}
+      >
+        {[
+          { icon: Cpu, label: 'CPU', value: systemStats.cpu as number, color: '#3B82F6' },
+          {
+            icon: MemoryStick,
+            label: 'RAM',
+            value: systemStats.memory as number,
+            color: '#10B981',
+          },
+          { icon: HardDrive, label: 'Disque', value: systemStats.disk as number, color: '#F59E0B' },
+          {
+            icon: BarChart3,
+            label: 'Réseau',
+            value: systemStats.network as number,
+            color: '#8B5CF6',
+          },
+        ].map((kpi, i) => (
+          <motion.div
+            key={kpi.label}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, delay: i * 0.05 }}
+            style={{
+              ...surface.muted,
+              padding: 16,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 8,
-                  background: stat.color,
+                  width: 40,
+                  height: 40,
+                  borderRadius: 10,
+                  background: kpi.color,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <stat.icon size={18} color="#fff" />
+                <kpi.icon size={20} color="#fff" />
               </div>
               <div>
-                <div style={{ fontSize: 18, fontWeight: 800 }}>{stat.value}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{stat.label}</div>
+                <div style={{ fontWeight: 800, fontSize: 18 }}>
+                  {formatPct(kpi.value as number)}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{kpi.label}</div>
               </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Grille des tuiles d'action */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-          gap: '24px',
-          maxWidth: '1400px',
-          margin: '0 auto',
-        }}
-      >
-        {dashboardTiles.map((tile, index) => (
-          <UnifiedTile
-            key={tile.title}
-            title={tile.title}
-            description={tile.description}
-            icon={tile.icon}
-            status={tile.status}
-            onAction={tile.action}
-            onLaunch={tile.action}
-            index={index}
-          />
+            </div>
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{
+                width: `${Math.max(8, Math.min(100, Math.round((kpi.value as number) || 0)))}%`,
+              }}
+              transition={{ duration: 0.5 }}
+              style={{
+                height: 6,
+                background: `${kpi.color}55`,
+                borderRadius: 999,
+                flex: 1,
+                marginLeft: 12,
+              }}
+            />
+          </motion.div>
         ))}
-      </div>
+      </section>
 
-      {/* Footer avec informations système */}
-      <motion.div
+      {/* Deux colonnes informatives */}
+      <section
+        style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}
+      >
+        {/* Colonne gauche: sections descriptives (liens, sans tuiles) */}
+        <motion.div
+          initial={{ opacity: 0, x: -12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.35 }}
+          style={{ display: 'grid', gap: 12 }}
+        >
+          <div style={{ ...surface.muted, padding: 18 }}>
+            <h2 style={{ margin: 0, fontSize: 18 }}>Fonctionnalités clés</h2>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 12, display: 'grid', gap: 10 }}>
+              {[
+                {
+                  label: 'Gestion des logiciels',
+                  desc: 'Installer, mettre à jour et gérer vos applications en un clic.',
+                  href: '/software',
+                  color: '#3B82F6',
+                  icon: Package,
+                },
+                {
+                  label: 'Applications portables',
+                  desc: 'Lancez des apps sans installation & sauvegardez vos préférées.',
+                  href: '/portable-apps',
+                  color: '#10B981',
+                  icon: Smartphone,
+                },
+                {
+                  label: 'Convertisseur de fichiers',
+                  desc: 'Convertissez vidéos, images, audio, documents, archives.',
+                  href: '/file-converter',
+                  color: '#F59E0B',
+                  icon: FileText,
+                },
+                {
+                  label: 'Analytics système',
+                  desc: 'Visualisez CPU, RAM, disque, réseau en temps réel.',
+                  href: '/analytics',
+                  color: '#8B5CF6',
+                  icon: BarChart3,
+                },
+              ].map((row, idx) => (
+                <li key={row.label}>
+                  <button
+                    onClick={() => (window.location.href = row.href)}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      borderRadius: 12,
+                      padding: 12,
+                      cursor: 'pointer',
+                    }}
+                    aria-label={row.label}
+                  >
+                    <span
+                      style={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: 10,
+                        background: row.color,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <row.icon size={18} color="#fff" />
+                    </span>
+                    <span style={{ display: 'grid', gap: 4 }}>
+                      <strong>{row.label}</strong>
+                      <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>{row.desc}</span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div style={{ ...surface.muted, padding: 18 }}>
+            <h2 style={{ margin: 0, fontSize: 18 }}>Conseils rapides</h2>
+            <ol style={{ margin: '12px 16px', padding: 0 }}>
+              <li>Utilisez la page God Mode pour les réglages Windows avancés.</li>
+              <li>Activez les sauvegardes régulières et gardez vos pilotes à jour.</li>
+              <li>Optimisez votre démarrage en désactivant les apps non essentielles.</li>
+            </ol>
+          </div>
+        </motion.div>
+
+        {/* Colonne droite: info système concise */}
+        <motion.aside
+          initial={{ opacity: 0, x: 12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.35 }}
+          style={{ display: 'grid', gap: 12 }}
+        >
+          <div style={{ ...surface.muted, padding: 16 }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>Système</h3>
+            <div style={{ display: 'grid', gap: 8, marginTop: 10, fontSize: 13 }}>
+              <div>OS: {sysInfo ? `${sysInfo.platform} ${sysInfo.version}` : '—'}</div>
+              <div>Arch: {sysInfo?.arch || '—'}</div>
+              <div>
+                CPU: {sysInfo?.cpuModel || '—'} ({sysInfo?.cpuCount || '—'} cœurs)
+              </div>
+              <div>
+                Mémoire: {prettyGB(sysInfo?.totalMemory)} • Libre: {prettyGB(sysInfo?.freeMemory)}
+              </div>
+            </div>
+          </div>
+          <div style={{ ...surface.muted, padding: 16 }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>Raccourcis utiles</h3>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+              <Button variant="outline" onClick={() => (window.location.href = '/god-mode')}>
+                God Mode
+              </Button>
+              <Button variant="outline" onClick={() => (window.location.href = '/chocolatey')}>
+                Chocolatey
+              </Button>
+              <Button variant="outline" onClick={() => (window.location.href = '/nas-explorer')}>
+                NAS
+              </Button>
+            </div>
+          </div>
+        </motion.aside>
+      </section>
+
+      {/* Footer */}
+      <motion.footer
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.6 }}
-        style={{
-          marginTop: '48px',
-          padding: '24px',
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '16px',
-          textAlign: 'center',
-        }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        style={{ marginTop: 28, textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}
       >
-        <p style={{ fontSize: 13, color: 'rgba(255, 255, 255, 0.6)', margin: 0 }}>
-          {t('footer_version_prefix') || 'VestyWinBox'} v1.0.0 •{' '}
-          {t('footer_last_update') || 'Dernière mise à jour'}:{' '}
-          {new Date().toLocaleDateString('fr-FR')}
-        </p>
-      </motion.div>
+        {t('footer_version_prefix') || 'VestyWinBox'} v1.0.0 •{' '}
+        {t('footer_last_update') || 'Dernière mise à jour'}:{' '}
+        {new Date().toLocaleDateString('fr-FR')}
+      </motion.footer>
     </div>
   )
 }

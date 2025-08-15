@@ -208,6 +208,52 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   chocoGetLogFile: (sessionId) =>
     ipcRenderer.invoke('chocoGetLogFile', sessionId).then((r) => (r && r.ok ? r.data : null)),
+
+  // === API réseau Electron (bypass CORS) ===
+  fetch: async (url, options = {}) => {
+    try {
+      const response = await ipcRenderer.invoke('electronFetch', url, options)
+
+      // Ajouter les méthodes text() et json() qui manquent
+      response.text = () => Promise.resolve(response._textData)
+      response.json = () => {
+        try {
+          return Promise.resolve(JSON.parse(response._textData))
+        } catch (e) {
+          return Promise.reject(new Error(`Invalid JSON: ${e.message}`))
+        }
+      }
+
+      return response
+    } catch (error) {
+      throw new Error(`Electron fetch error: ${error.message}`)
+    }
+  },
+
+  // === API téléchargement Electron ===
+  downloadFile: async (url, fileName) => {
+    try {
+      const result = await ipcRenderer.invoke('downloadFile', url, fileName)
+      return result
+    } catch (error) {
+      throw new Error(`Download error: ${error.message}`)
+    }
+  },
+
+  // === API shell Electron ===
+  shell: {
+    openExternal: (url) => ipcRenderer.invoke('openExternal', url),
+  },
+
+  // === API fenêtre web Electron ===
+  openWebWindow: async (url) => {
+    try {
+      const result = await ipcRenderer.invoke('openWebWindow', url)
+      return result
+    } catch (error) {
+      throw new Error(`Web window error: ${error.message}`)
+    }
+  },
 })
 
 // Gestion des erreurs

@@ -537,7 +537,7 @@ const FileConverterPage: React.FC = () => {
                   fontSize: '36px',
                   fontWeight: '800',
                   margin: 0,
-                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                  backgroundImage: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -1094,7 +1094,7 @@ const FileConverterPage: React.FC = () => {
                   >
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${conversionProgress}%` }}
+                      animate={{ width: `${Math.max(0, Math.min(100, conversionProgress || 0))}%` }}
                       style={{
                         height: '100%',
                         background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',

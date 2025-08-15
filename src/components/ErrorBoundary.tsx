@@ -77,7 +77,7 @@ class ErrorBoundary extends Component<Props, State> {
                 fontSize: '24px',
                 fontWeight: '700',
                 margin: '0 0 16px 0',
-                background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+                backgroundImage: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',

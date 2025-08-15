@@ -662,7 +662,7 @@ const ChocolateyPage: React.FC = () => {
                 fontSize: 32,
                 fontWeight: 800,
                 margin: 0,
-                background: 'linear-gradient(135deg,#8B5CF6 0%, #7C3AED 100%)',
+                backgroundImage: 'linear-gradient(135deg,#8B5CF6 0%, #7C3AED 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',

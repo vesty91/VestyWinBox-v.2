@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
-  Home,
-  Package,
-  Smartphone,
   BarChart3,
-  Settings,
   FileText,
   HardDrive,
+  Home,
+  Lock,
   Menu,
-  X,
+  Package,
+  Settings,
+  Smartphone,
   Sparkles,
+  X,
 } from 'lucide-react'
-import './VIPLayout.css'
+import React, { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Button from '../../ui/components/Button'
+import './VIPLayout.css'
 // i18n supprimé: FR uniquement
 import { surface } from '../../ui/styles/tokens'
 
@@ -75,10 +76,22 @@ const navItems: NavItem[] = [
     gradient: 'linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)',
   },
   {
+    path: '/billing',
+    label: 'Facturation',
+    icon: Settings,
+    gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+  },
+  {
     path: '/chocolatey',
     label: 'Chocolatey',
     icon: Package,
     gradient: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+  },
+  {
+    path: '/settings',
+    label: 'Paramètres',
+    icon: Settings,
+    gradient: 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)',
   },
 ]
 
@@ -434,66 +447,8 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
 
             {/* Boutons d'action */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div
-                style={{
-                  ...surface.muted,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  borderRadius: 8,
-                  padding: 4,
-                }}
-              >
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setTheme('dark')}
-                  title="Thème sombre"
-                  style={{ background: theme === 'dark' ? 'var(--accent)' : 'transparent' }}
-                >
-                  Sombre
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setTheme('light')}
-                  title="Thème clair"
-                  style={{ background: theme === 'light' ? 'var(--accent)' : 'transparent' }}
-                >
-                  Clair
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setTheme('gold')}
-                  title="Thème or"
-                  style={{ background: theme === 'gold' ? 'var(--accent)' : 'transparent' }}
-                >
-                  Gold
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setTheme('neon')}
-                  title="Thème néon"
-                  style={{ background: theme === 'neon' ? 'var(--accent)' : 'transparent' }}
-                >
-                  Néon
-                </Button>
-              </div>
               {/* Toggle langue retiré: FR uniquement */}
-              <Button
-                onClick={toggleLockSidebar}
-                title={
-                  lockSidebar ? 'Déverrouiller la barre latérale' : 'Verrouiller la barre latérale'
-                }
-                variant={lockSidebar ? 'primary' : 'outline'}
-              >
-                {lockSidebar ? 'Verrouillé' : 'Verrouiller'}
-              </Button>
-              <Button onClick={() => navigate('/settings')} variant="outline" title="Paramètres">
-                Paramètres
-              </Button>
+
               <Button
                 onClick={toggleSidebar}
                 ariaLabel="Menu de navigation"
@@ -538,6 +493,36 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
                     gap: '8px',
                   }}
                 >
+                  {/* Bouton de verrouillage de la sidebar */}
+                  <motion.li whileHover={{ x: 8 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      onClick={toggleLockSidebar}
+                      fullWidth
+                      variant="ghost"
+                      title={
+                        lockSidebar
+                          ? 'Déverrouiller la barre latérale'
+                          : 'Verrouiller la barre latérale'
+                      }
+                      style={{
+                        background: lockSidebar
+                          ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)'
+                          : 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: 12,
+                        padding: 16,
+                        display: 'flex',
+                        justifyContent: 'flex-start',
+                        gap: 12,
+                        fontWeight: lockSidebar ? 600 : 500,
+                        marginBottom: '12px',
+                      }}
+                    >
+                      <Lock size={20} />
+                      {lockSidebar ? 'Déverrouiller' : 'Verrouiller'}
+                    </Button>
+                  </motion.li>
+
                   {navItems.map((item) => {
                     const isActive = location.pathname === item.path
                     return (

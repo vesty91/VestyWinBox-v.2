@@ -160,7 +160,7 @@ const SoftwarePage: React.FC = () => {
                 fontSize: 36,
                 fontWeight: 800,
                 margin: '0 0 8px 0',
-                background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+                backgroundImage: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',

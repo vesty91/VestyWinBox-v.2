@@ -85,7 +85,7 @@ const AnalyticsPage: React.FC = () => {
                 fontSize: 32,
                 fontWeight: 800,
                 margin: 0,
-                background: 'linear-gradient(135deg,#8B5CF6 0%, #7C3AED 100%)',
+                backgroundImage: 'linear-gradient(135deg,#8B5CF6 0%, #7C3AED 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -196,7 +196,7 @@ const AnalyticsPage: React.FC = () => {
             >
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${metric.value}%` }}
+                animate={{ width: `${Math.max(0, Math.min(100, metric.value || 0))}%` }}
                 transition={{ duration: 0.4 }}
                 style={{ height: '100%', background: metric.color }}
               />

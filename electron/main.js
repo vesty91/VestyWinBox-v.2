@@ -4,6 +4,10 @@ const fs = require('fs')
 const { exec, spawn } = require('child_process')
 const os = require('os')
 const { execSync } = require('child_process')
+
+// Helper functions pour les réponses IPC
+const ok = (data) => ({ ok: true, data })
+const err = (error) => ({ ok: false, error: typeof error === 'string' ? error : error.message })
 let autoUpdater = null
 try {
   autoUpdater = require('electron-updater').autoUpdater
@@ -24,8 +28,8 @@ function createWindow() {
       contextIsolation: true,
       enableRemoteModule: false,
       preload: path.join(__dirname, 'preload.js'),
-      webSecurity: true,
-      allowRunningInsecureContent: false,
+      webSecurity: false, // Désactiver pour permettre les requêtes CORS
+      allowRunningInsecureContent: true, // Permettre le contenu non sécurisé si nécessaire
       // Désactiver le cache pour éviter les problèmes
       partition: 'persist:main',
     },
@@ -2252,6 +2256,155 @@ ipcMain.handle('convertFiles', async (event, payload) => {
   return ok(true)
 })
 
+// === APIs téléchargement ===
+ipcMain.handle('downloadFile', async (event, url, fileName) => {
+  try {
+    const { dialog } = require('electron')
+    const path = require('path')
+    const os = require('os')
+
+    console.log('Download request:', { url, fileName })
+
+    // Demander où sauvegarder le fichier
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: 'Sauvegarder le fichier',
+      defaultPath: path.join(os.homedir(), 'Downloads', fileName),
+      filters: [{ name: 'Tous les fichiers', extensions: ['*'] }],
+    })
+
+    if (result.canceled) {
+      return { success: false, message: 'Download cancelled by user' }
+    }
+
+    const savePath = result.filePath
+    console.log('Saving to:', savePath)
+
+    // Télécharger le fichier avec le module net d'Electron
+    const { net } = require('electron')
+    const fs = require('fs')
+
+    const request = net.request({
+      method: 'GET',
+      url: url,
+    })
+
+    return new Promise((resolve, reject) => {
+      request.on('response', (response) => {
+        if (response.statusCode !== 200) {
+          reject(new Error(`HTTP ${response.statusCode}: ${response.statusMessage}`))
+          return
+        }
+
+        const fileStream = fs.createWriteStream(savePath)
+
+        response.on('data', (chunk) => {
+          fileStream.write(chunk)
+        })
+
+        response.on('end', () => {
+          fileStream.end()
+          console.log('Download completed:', savePath)
+          resolve({ success: true, path: savePath })
+        })
+
+        response.on('error', (error) => {
+          fileStream.end()
+          reject(error)
+        })
+      })
+
+      request.on('error', (error) => {
+        reject(error)
+      })
+
+      request.end()
+    })
+  } catch (error) {
+    console.error('Download error:', error)
+    return { success: false, message: error.message }
+  }
+})
+
+// === API shell ===
+ipcMain.handle('openExternal', async (event, url) => {
+  try {
+    const { shell } = require('electron')
+    await shell.openExternal(url)
+    return { success: true }
+  } catch (error) {
+    console.error('Error opening external URL:', error)
+    return { success: false, message: error.message }
+  }
+})
+
+// === APIs réseau pour NAS ===
+ipcMain.handle('electronFetch', async (event, url, options = {}) => {
+  try {
+    const { net } = require('electron')
+
+    console.log('Electron fetch:', url, options)
+
+    // Créer la requête avec Electron net module (bypass CORS)
+    const request = net.request({
+      method: options.method || 'GET',
+      url: url,
+      redirect: 'follow',
+    })
+
+    // Ajouter les headers
+    if (options.headers) {
+      Object.entries(options.headers).forEach(([key, value]) => {
+        request.setHeader(key, value)
+      })
+    }
+
+    // Gérer les données POST
+    if (options.body) {
+      request.write(options.body)
+    }
+
+    return new Promise((resolve, reject) => {
+      let responseData = Buffer.alloc(0)
+
+      request.on('response', (response) => {
+        response.on('data', (chunk) => {
+          responseData = Buffer.concat([responseData, chunk])
+        })
+
+        response.on('end', () => {
+          try {
+            const textData = responseData.toString('utf8')
+            console.log('Response received:', response.statusCode, textData.substring(0, 200))
+
+            // Créer un objet simple que IPC peut cloner
+            const result = {
+              ok: response.statusCode >= 200 && response.statusCode < 300,
+              status: response.statusCode,
+              statusText: response.statusMessage || '',
+              headers: JSON.parse(JSON.stringify(response.headers)), // Sérialiser les headers
+              url: url,
+              _textData: textData, // Stocker les données directement
+            }
+            resolve(result)
+          } catch (error) {
+            reject(error)
+          }
+        })
+      })
+
+      request.on('error', (error) => {
+        console.error('Electron fetch error:', error)
+        reject(new Error(`Network error: ${error.message}`))
+      })
+
+      request.end()
+    })
+  } catch (error) {
+    console.error('Electron fetch setup error:', error)
+    throw new Error(`Fetch error: ${error.message}`)
+  }
+})
+
 // === Analytics temps réel ===
 let __lastCpuInfo = null
 let __lastNet = { bytes: 0, ts: 0 }
@@ -2369,7 +2522,7 @@ ipcMain.handle('getRealtimeAnalytics', async () => {
   const mem = getMemPercent()
   const disk = getDiskUsedPercent()
   const net = getNetworkKbps()
-  return ok({ cpu, memory: mem, disk, networkKbps: net })
+  return { ok: true, data: { cpu, memory: mem, disk, networkKbps: net } }
 })
 
 // Persistance simple du dossier racine des apps portables
@@ -2722,5 +2875,37 @@ ipcMain.handle('convertGetLogFile', async (_e, sessionId) => {
     return ok(null)
   } catch (e) {
     return err(e)
+  }
+})
+
+// Ouvrir une nouvelle fenêtre Electron pour l'interface web du NAS
+ipcMain.handle('openWebWindow', async (event, url) => {
+  try {
+    const webWindow = new BrowserWindow({
+      width: 1200,
+      height: 800,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        webSecurity: false, // Pour permettre l'accès aux NAS externes
+        allowRunningInsecureContent: true,
+      },
+      show: true,
+      title: 'Interface Web NAS',
+      icon: path.join(__dirname, 'assets/icon.png'), // Si tu as une icône
+    })
+
+    // Charger l'URL du NAS
+    await webWindow.loadURL(url)
+
+    // Optionnel : fermer la fenêtre quand elle n'est plus nécessaire
+    webWindow.on('closed', () => {
+      console.log('Fenêtre web NAS fermée')
+    })
+
+    return { ok: true, data: 'Window opened successfully' }
+  } catch (error) {
+    console.error("Erreur lors de l'ouverture de la fenêtre web:", error)
+    return { ok: false, error: error.message }
   }
 })

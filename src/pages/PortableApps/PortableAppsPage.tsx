@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Play, RefreshCw, Smartphone, Info, X, FolderOpen } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { FolderOpen, Info, Play, RefreshCw, Search, Smartphone, X } from 'lucide-react'
+import React, { useCallback, useEffect, useState } from 'react'
 import UnifiedTile from '../../components/UnifiedTile/UnifiedTile'
-import toolsService, { Tool, Category } from '../../services/ToolsService'
-import { modalBackdrop, modalCard, closeBtn } from '../../ui/modalStyles'
-import Button from '../../ui/components/Button'
 import { t } from '../../i18n'
-import { surface, input as inputTokens, select as selectTokens } from '../../ui/styles/tokens'
+import toolsService, { Category, Tool } from '../../services/ToolsService'
+import Button from '../../ui/components/Button'
+import { closeBtn, modalBackdrop, modalCard } from '../../ui/modalStyles'
+import { input as inputTokens, select as selectTokens, surface } from '../../ui/styles/tokens'
 
 const PortableAppsPage: React.FC = () => {
   const hasElectron = typeof window !== 'undefined' && !!(window as any).electronAPI
@@ -911,7 +911,7 @@ const PortableAppsPage: React.FC = () => {
                 fontSize: '36px',
                 fontWeight: '800',
                 margin: '0 0 8px 0',
-                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                backgroundImage: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
