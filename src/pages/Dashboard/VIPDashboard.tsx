@@ -8,6 +8,7 @@ import {
   Package,
   Settings,
   Smartphone,
+  RefreshCw,
 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { t } from '../../i18n'
