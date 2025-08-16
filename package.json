@@ -1,6 +1,6 @@
 {
   "name": "vestywinbox",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Gestionnaire système Windows moderne avec interface glassmorphism",
   "author": "Vesty",
   "main": "electron/main.js",
