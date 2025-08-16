@@ -2,7 +2,7 @@
   "appId": "com.vestywinbox.app",
   "productName": "VestyWinBox",
   "directories": {
-    "output": "release-build"
+    "output": "release-pub"
   },
   "files": [
     "dist/**/*",
