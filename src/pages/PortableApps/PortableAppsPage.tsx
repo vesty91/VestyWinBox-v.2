@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { FolderOpen, Info, Play, RefreshCw, Search, Smartphone, X } from 'lucide-react'
+import { FolderOpen, Info, Play, Search, Smartphone, X } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import UnifiedTile from '../../components/UnifiedTile/UnifiedTile'
 import { t } from '../../i18n'
@@ -777,7 +777,7 @@ const PortableAppsPage: React.FC = () => {
     if (launchingApps.includes(app.id)) {
       return {
         text: 'Lancement...',
-        icon: RefreshCw,
+        icon: () => <span style={{display:'inline-block',transform:'rotate(0deg)'}}>↻</span>,
         action: () => {},
         status: 'installing' as const,
       }

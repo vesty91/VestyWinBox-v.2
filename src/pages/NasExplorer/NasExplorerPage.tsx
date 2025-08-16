@@ -9,7 +9,6 @@ import {
   HardDrive,
   LogIn,
   LogOut,
-  RefreshCw,
   Search,
   Server,
   Users,
@@ -594,7 +593,7 @@ const NasExplorerPage: React.FC = () => {
                 opacity: isRefreshing ? 0.7 : 1,
               }}
             >
-              <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
+              <span className={isRefreshing ? 'animate-spin' : ''} aria-hidden>↻</span>
               Actualiser
             </button>
 
@@ -737,7 +736,7 @@ const NasExplorerPage: React.FC = () => {
                     {server.status === 'connected' ? (
                       <Wifi size={16} color="#10B981" />
                     ) : server.status === 'connecting' ? (
-                      <RefreshCw size={16} color="#F59E0B" className="animate-spin" />
+                      <span className="animate-spin" aria-hidden>↻</span>
                     ) : (
                       <WifiOff size={16} color="#EF4444" />
                     )}
@@ -920,7 +919,7 @@ const NasExplorerPage: React.FC = () => {
                     color: 'rgba(255, 255, 255, 0.6)',
                   }}
                 >
-                  <RefreshCw size={16} className="animate-spin" />
+                  <span className="animate-spin" aria-hidden>↻</span>
                   Chargement...
                 </div>
               )}
@@ -1110,11 +1109,7 @@ const NasExplorerPage: React.FC = () => {
               >
                 {isLoadingFiles ? (
                   <>
-                    <RefreshCw
-                      size={48}
-                      className="animate-spin"
-                      style={{ marginBottom: '16px' }}
-                    />
+                    <span className="animate-spin" style={{ fontSize: 48, marginBottom: '16px' }} aria-hidden>↻</span>
                     <p style={{ fontSize: '16px', margin: 0 }}>Chargement des fichiers...</p>
                   </>
                 ) : session ? (

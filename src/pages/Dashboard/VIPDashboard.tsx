@@ -6,7 +6,6 @@ import {
   HardDrive,
   MemoryStick,
   Package,
-  RefreshCw,
   Settings,
   Smartphone,
 } from 'lucide-react'
@@ -118,12 +117,7 @@ const VIPDashboard: React.FC = () => {
               onClick={() => (window as any).electronAPI?.updateCheck?.()}
               title="Vérifier les mises à jour"
             >
-              {typeof RefreshCw !== 'undefined' ? (
-                <RefreshCw size={16} />
-              ) : (
-                <span aria-hidden>↻</span>
-              )}
-              &nbsp;Vérifier maj
+              <span aria-hidden>↻</span>&nbsp;Vérifier maj
             </Button>
             <Button
               variant="ghost"
