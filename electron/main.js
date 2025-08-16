@@ -16,6 +16,27 @@ try {
 // Garder une référence globale de l'objet window
 let mainWindow
 
+// Fonction pour notifications système avec icône
+function showNotification(title, body, options = {}) {
+  if (process.platform === 'win32') {
+    const { Notification } = require('electron')
+
+    if (Notification.isSupported()) {
+      const notification = new Notification({
+        title,
+        body,
+        icon: path.join(__dirname, '../assets/icon.ico'),
+        silent: options.silent || false,
+        ...options,
+      })
+
+      notification.show()
+      return notification
+    }
+  }
+  return null
+}
+
 function createWindow() {
   // Créer la fenêtre du navigateur
   mainWindow = new BrowserWindow({
@@ -37,6 +58,9 @@ function createWindow() {
     titleBarStyle: 'default',
     show: false,
     backgroundColor: '#0f0f0f',
+    // Configuration barre des tâches
+    skipTaskbar: false, // Afficher dans la barre des tâches
+    alwaysOnTop: false,
   })
 
   // Nettoyer le cache au démarrage
@@ -58,7 +82,7 @@ function createWindow() {
   })
 
   // Charger l'application
-  const isDev = !app.isPackaged && process.env.NODE_ENV !== 'production'
+  const isDev = !app.isPackaged
 
   if (isDev) {
     // Attendre que le serveur soit prêt
@@ -91,6 +115,24 @@ function createWindow() {
   // Afficher la fenêtre quand elle est prête
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
+
+    // Configuration barre des tâches Windows
+    if (process.platform === 'win32') {
+      // Titre de la fenêtre et barre des tâches
+      mainWindow.setTitle('VestyWinBox - Gestionnaire Système Windows')
+
+      // Configurer l'ID utilisateur pour Windows
+      app.setAppUserModelId('com.vestywinbox.app')
+
+      // Notification de bienvenue (optionnelle)
+      setTimeout(() => {
+        showNotification(
+          'VestyWinBox démarré !',
+          "Votre gestionnaire système Windows est prêt à l'usage.",
+          { silent: true },
+        )
+      }, 2000)
+    }
 
     if (isDev) {
       // Animation d'entrée simple uniquement en dev
@@ -202,7 +244,7 @@ function createWindow() {
 
 // Fonction pour obtenir le chemin des apps portables après unpacking ASAR
 function getPortableAppsPath() {
-  const isDev = process.env.NODE_ENV === 'development'
+  const isDev = !app.isPackaged
 
   if (isDev) {
     // En développement, utiliser le chemin normal
@@ -2603,7 +2645,7 @@ ipcMain.handle('launchApplicationWithCwdElevated', async (_e, executablePath, wo
 })
 
 function getAssetsIconsPath() {
-  const isDev = process.env.NODE_ENV === 'development'
+  const isDev = !app.isPackaged
   return isDev
     ? path.join(__dirname, '../assets/icons')
     : path.join(process.resourcesPath, 'app.asar.unpacked/assets/icons')

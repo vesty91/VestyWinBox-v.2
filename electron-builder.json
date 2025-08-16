@@ -4,16 +4,23 @@
   "directories": {
     "output": "release"
   },
-  "files": ["dist/**/*", "electron/**/*", "assets/**/*", "node_modules/**/*"],
+  "files": ["dist/**/*", "electron/**/*", "assets/**/*", "node_modules/**/*", "package.json"],
   "asarUnpack": ["assets/Apps portable/**/*"],
+  "icon": "assets/icon.ico",
   "win": {
-    "target": "nsis"
+    "target": "nsis",
+    "icon": "assets/icon.ico"
   },
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "VestyWinBox"
+    "shortcutName": "VestyWinBox",
+    "runAfterFinish": false,
+    "menuCategory": "VestyWinBox",
+    "deleteAppDataOnUninstall": false,
+    "artifactName": "${productName} Setup ${version}.exe",
+    "uninstallDisplayName": "VestyWinBox"
   }
 }

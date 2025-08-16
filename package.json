@@ -2,6 +2,7 @@
   "name": "vestywinbox",
   "version": "1.0.0",
   "description": "Gestionnaire système Windows moderne avec interface glassmorphism",
+  "author": "Vesty",
   "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -21,6 +22,7 @@
     "build:portable": "npm run build && electron-builder --win portable",
     "test": "vitest run",
     "test:watch": "vitest",
+    "generate:icon": "node scripts/generate-icons.js",
     "e2e": "npm run build && playwright test --config e2e/playwright.config.ts"
   },
   "dependencies": {
@@ -29,14 +31,12 @@
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1",
-    "react-window": "^1.8.11"
+    "react-router-dom": "^6.20.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.46.0",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
-    "@types/react-window": "^1.8.8",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.1.1",
@@ -48,12 +48,12 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "espree": "^10.4.0",
     "jsdom": "^26.1.0",
     "prettier": "^3.3.3",
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
-    "vitest": "^2.0.5",
-    "wait-on": "^7.2.0"
+    "vitest": "^2.0.5"
   },
   "build": {
     "appId": "com.vestywinbox.app",

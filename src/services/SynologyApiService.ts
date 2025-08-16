@@ -1,3 +1,5 @@
+import { log } from '../utils/logger'
+
 interface SynologyCredentials {
   host: string
   username: string
@@ -89,7 +91,7 @@ class SynologyApiService {
         throw new Error(`Failed to get API info: ${this.getErrorMessage(data.error?.code)}`)
       }
     } catch (error: any) {
-      console.error('Error getting API info:', error)
+      log.error('Error getting API info:', error)
 
       // Check for specific CORS/network errors
       if (error.message?.includes('Failed to fetch') || error.name === 'TypeError') {
@@ -157,7 +159,7 @@ class SynologyApiService {
         throw new Error(`Authentication failed: ${this.getErrorMessage(data.error?.code)}`)
       }
     } catch (error) {
-      console.error('Authentication error:', error)
+      log.error('Authentication error:', error)
       throw error
     }
   }
@@ -198,7 +200,7 @@ class SynologyApiService {
 
         await (window as any).electronAPI.fetch(`${this.baseUrl}/webapi/${authApi.path}?${params}`)
       } catch (error) {
-        console.error('Logout error:', error)
+        log.error('Logout error:', error)
       }
     }
 
@@ -235,7 +237,7 @@ class SynologyApiService {
         throw new Error(`Failed to get shared folders: ${this.getErrorMessage(data.error?.code)}`)
       }
     } catch (error) {
-      console.error('Error getting shared folders:', error)
+      log.error('Error getting shared folders:', error)
       throw error
     }
   }
@@ -250,7 +252,7 @@ class SynologyApiService {
         throw new Error('FileStation.List API not available')
       }
 
-      console.log(`Listing files in: ${folderPath}`)
+      log.debug(`Listing files in: ${folderPath}`)
 
       const params = new URLSearchParams({
         api: 'SYNO.FileStation.List',
@@ -272,19 +274,19 @@ class SynologyApiService {
       }
 
       const data = await response.json()
-      console.log('List files response:', data)
+      log.debug('List files response:', data)
 
       if (data.success) {
         const files = data.data?.files || []
-        console.log(`Found ${files.length} files in ${folderPath}`)
+        log.debug(`Found ${files.length} files in ${folderPath}`)
         return files
       } else {
         const errorMsg = this.getErrorMessage(data.error?.code)
-        console.error('List files API error:', data.error)
+        log.error('List files API error:', data.error)
         throw new Error(`Failed to list files: ${errorMsg}`)
       }
     } catch (error) {
-      console.error('Error listing files:', error)
+      log.error('Error listing files:', error)
       throw error
     }
   }
@@ -295,7 +297,6 @@ class SynologyApiService {
 
     try {
       // Get CPU and memory info
-      const systemApi = this.apiInfo['SYNO.Core.System.Utilization']
       const params = new URLSearchParams({
         api: 'SYNO.Core.System.Utilization',
         version: '1',
@@ -331,7 +332,7 @@ class SynologyApiService {
         }
       }
     } catch (error) {
-      console.error('Error getting system info:', error)
+      log.error('Error getting system info:', error)
       // Return simulated data on error
       return {
         cpu_usage: Math.random() * 100,
@@ -349,7 +350,6 @@ class SynologyApiService {
     if (!this.session) throw new Error('Not authenticated')
 
     try {
-      const storageApi = this.apiInfo['SYNO.Storage.CGI.Storage']
       const params = new URLSearchParams({
         api: 'SYNO.Storage.CGI.Storage',
         version: '1',
@@ -385,7 +385,7 @@ class SynologyApiService {
         ]
       }
     } catch (error) {
-      console.error('Error getting volume info:', error)
+      log.error('Error getting volume info:', error)
       // Return simulated data on error
       return [
         {
@@ -420,7 +420,7 @@ class SynologyApiService {
       })
 
       const downloadUrl = `${this.baseUrl}/webapi/${downloadApi.path}?${params}`
-      console.log('Download URL:', downloadUrl)
+      log.debug('Download URL:', downloadUrl)
 
       // Si on est dans Electron, utiliser l'API Electron pour télécharger
       if ((window as any).electronAPI) {
@@ -436,7 +436,7 @@ class SynologyApiService {
 
       return downloadUrl
     } catch (error) {
-      console.error('Error preparing download:', error)
+      log.error('Error preparing download:', error)
       throw error
     }
   }
@@ -462,11 +462,11 @@ class SynologyApiService {
       })
 
       const imageUrl = `${this.baseUrl}/webapi/${downloadApi.path}?${params}`
-      console.log('Image preview URL:', imageUrl)
+      log.debug('Image preview URL:', imageUrl)
 
       return imageUrl
     } catch (error) {
-      console.error('Error generating image preview URL:', error)
+      log.error('Error generating image preview URL:', error)
       throw error
     }
   }

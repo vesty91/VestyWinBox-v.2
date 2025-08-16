@@ -26,6 +26,7 @@ import SynologyApiService, {
   SystemInfo,
   VolumeInfo,
 } from '../../services/SynologyApiService'
+import { log } from '../../utils/logger'
 
 interface NasServer {
   id: string
@@ -52,9 +53,9 @@ const NasExplorerPage: React.FC = () => {
   const [apiService, setApiService] = useState<SynologyApiService | null>(null)
   const [session, setSession] = useState<SynologySession | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null)
-  const [volumes, setVolumes] = useState<VolumeInfo[]>([])
-  const [shares, setShares] = useState<ShareInfo[]>([])
+  const [_systemInfo, setSystemInfo] = useState<SystemInfo | null>(null)
+  const [_volumes, setVolumes] = useState<VolumeInfo[]>([])
+  const [_shares, setShares] = useState<ShareInfo[]>([])
 
   const [servers, setServers] = useState<NasServer[]>([
     {
@@ -101,11 +102,45 @@ const NasExplorerPage: React.FC = () => {
 
   // Check for existing session on component mount
   useEffect(() => {
+    const loadData = async (service: SynologyApiService) => {
+      try {
+        const [systemData, volumesData, sharesData] = await Promise.all([
+          service.getSystemInfo(),
+          service.getVolumeInfo(),
+          service.getSharedFolders(),
+        ])
+
+        setSystemInfo(systemData)
+        setVolumes(volumesData)
+        setShares(sharesData)
+
+        if (volumesData.length > 0) {
+          const totalSpace = volumesData.reduce((sum, vol) => sum + vol.total_space, 0)
+          const usedSpace = volumesData.reduce((sum, vol) => sum + vol.used_space, 0)
+
+          updateServerStatus('1', 'connected')
+          setServers((prev) =>
+            prev.map((s) =>
+              s.id === '1'
+                ? {
+                    ...s,
+                    totalSpace: Math.round(totalSpace / (1024 * 1024 * 1024)),
+                    usedSpace: Math.round(usedSpace / (1024 * 1024 * 1024)),
+                  }
+                : s,
+            ),
+          )
+        }
+      } catch (error) {
+        log.error('Error loading dashboard data', error, 'NasExplorer')
+      }
+    }
+
     const savedService = new SynologyApiService('nas.restor-pc.fr')
     if (savedService.isAuthenticated()) {
       setApiService(savedService)
       setSession(savedService.getSession())
-      loadDashboardData(savedService)
+      loadData(savedService)
       updateServerStatus('1', 'connected')
     }
   }, [])
@@ -207,16 +242,16 @@ const NasExplorerPage: React.FC = () => {
         loadFiles(service, currentPath)
       }
     } catch (error) {
-      console.error('Error loading dashboard data:', error)
+      log.error('Error loading dashboard data', error, 'NasExplorer')
     }
   }
 
   const loadSharedFolders = async (service: SynologyApiService) => {
     setIsLoadingFiles(true)
     try {
-      console.log('Loading shared folders...')
+      log.info('Loading shared folders...', undefined, 'NasExplorer')
       const sharesData = await service.getSharedFolders()
-      console.log('Shared folders data:', sharesData)
+      log.info('Shared folders data loaded', { count: sharesData?.length }, 'NasExplorer')
 
       if (sharesData && sharesData.length > 0) {
         const shareFiles: FileItem[] = sharesData.map((share) => ({
@@ -227,14 +262,14 @@ const NasExplorerPage: React.FC = () => {
           path: share.path || `/volume1/${share.name}`,
         }))
         setFiles(shareFiles)
-        console.log('Shared folders loaded:', shareFiles.length)
+        log.debug('Shared folders loaded:', shareFiles.length)
       } else {
-        console.log('No shared folders found, using fallback')
+        log.debug('No shared folders found, using fallback')
         // Fallback - essayons de lister directement les volumes
         await loadVolumeContents(service)
       }
     } catch (error) {
-      console.error('Error loading shared folders:', error)
+      log.error('Error loading shared folders:', error)
       // Fallback to volume listing
       await loadVolumeContents(service)
     } finally {
@@ -244,7 +279,7 @@ const NasExplorerPage: React.FC = () => {
 
   const loadVolumeContents = async (service: SynologyApiService) => {
     try {
-      console.log('Trying to load volume contents...')
+      log.debug('Trying to load volume contents...')
       // Essayer de lister le contenu du volume principal
       const volumeFiles = await service.listFiles('/volume1')
       const fileItems: FileItem[] = volumeFiles.map((file) => ({
@@ -256,9 +291,9 @@ const NasExplorerPage: React.FC = () => {
         path: file.path,
       }))
       setFiles(fileItems)
-      console.log('Volume contents loaded:', fileItems.length)
+      log.debug('Volume contents loaded:', fileItems.length)
     } catch (error) {
-      console.error('Error loading volume contents:', error)
+      log.error('Error loading volume contents:', error)
       // Dernier fallback - dossiers communs Synology
       setFiles([
         {
@@ -314,7 +349,7 @@ const NasExplorerPage: React.FC = () => {
       }))
       setFiles(fileItems)
     } catch (error) {
-      console.error('Error loading files:', error)
+      log.error('Error loading files:', error)
       setFiles([])
     } finally {
       setIsLoadingFiles(false)
@@ -378,19 +413,19 @@ const NasExplorerPage: React.FC = () => {
 
   const handlePreviewImage = async (file: FileItem) => {
     if (!apiService || !file.path) {
-      console.error('No API service or file path available')
+      log.error('No API service or file path available')
       return
     }
 
     try {
-      console.log('Opening image preview for:', file.name)
+      log.debug('Opening image preview for:', file.name)
       setPreviewFile(file)
 
       // Générer l'URL de prévisualisation
       const imageUrl = await apiService.getImagePreviewUrl(file.path)
       setPreviewUrl(imageUrl)
     } catch (error) {
-      console.error('Preview error:', error)
+      log.error('Preview error:', error)
       // En cas d'erreur, télécharger le fichier
       handleDownloadFile(file)
     }
@@ -417,21 +452,21 @@ const NasExplorerPage: React.FC = () => {
 
   const handleDownloadFile = async (file: FileItem) => {
     if (!apiService || !file.path) {
-      console.error('No API service or file path available')
+      log.error('No API service or file path available')
       return
     }
 
     try {
-      console.log('Starting download for:', file.name)
+      log.debug('Starting download for:', file.name)
 
       const result = await apiService.downloadFile(file.path)
 
       if (result === 'Downloaded via Electron') {
-        console.log('File downloaded successfully via Electron')
+        log.debug('File downloaded successfully via Electron')
         // Le fichier a été téléchargé via Electron, pas besoin d'ouvrir le navigateur
       } else {
         // Fallback: c'est une URL, l'ouvrir dans le navigateur par défaut
-        console.log('Opening download URL in browser:', result)
+        log.debug('Opening download URL in browser:', result)
         if ((window as any).electronAPI?.shell?.openExternal) {
           // Utiliser l'API Electron pour ouvrir dans le navigateur par défaut
           ;(window as any).electronAPI.shell.openExternal(result)
@@ -441,7 +476,7 @@ const NasExplorerPage: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error('Download error:', error)
+      log.error('Download error:', error)
       alert(`Erreur de téléchargement: ${error.message}`)
     }
   }
@@ -473,7 +508,7 @@ const NasExplorerPage: React.FC = () => {
         window.open(url, '_blank')
       }
     } catch (error) {
-      console.error("Erreur lors de l'ouverture de l'interface web:", error)
+      log.error("Erreur lors de l'ouverture de l'interface web:", error)
       // Fallback vers le navigateur externe en cas d'erreur
       window.open(url, '_blank')
     }
@@ -501,42 +536,42 @@ const NasExplorerPage: React.FC = () => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div
-            style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '16px',
-              background: 'linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <HardDrive size={28} color="white" />
-          </div>
-          <div>
-            <h1
+            <div
               style={{
-                fontSize: '36px',
-                fontWeight: '800',
-                margin: '0 0 8px 0',
+                width: '56px',
+                height: '56px',
+                borderRadius: '16px',
+                background: 'linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <HardDrive size={28} color="white" />
+            </div>
+            <div>
+              <h1
+                style={{
+                  fontSize: '36px',
+                  fontWeight: '800',
+                  margin: '0 0 8px 0',
                   backgroundImage: 'linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              NAS Explorer
-            </h1>
-            <p
-              style={{
-                fontSize: '16px',
-                color: 'rgba(255, 255, 255, 0.7)',
-                margin: 0,
-              }}
-            >
-              Explorez et gérez vos serveurs NAS et stockage réseau
-            </p>
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                NAS Explorer
+              </h1>
+              <p
+                style={{
+                  fontSize: '16px',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  margin: 0,
+                }}
+              >
+                Explorez et gérez vos serveurs NAS et stockage réseau
+              </p>
             </div>
           </div>
 
@@ -877,8 +912,8 @@ const NasExplorerPage: React.FC = () => {
               </div>
 
               {isLoadingFiles && (
-      <div
-        style={{
+                <div
+                  style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
@@ -1266,7 +1301,7 @@ const NasExplorerPage: React.FC = () => {
                   objectFit: 'contain',
                 }}
                 onError={(e) => {
-                  console.error('Image loading error:', e)
+                  log.error('Image loading error:', e)
                   closePreview()
                   handleDownloadFile(previewFile)
                 }}

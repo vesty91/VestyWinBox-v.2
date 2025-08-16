@@ -28,7 +28,6 @@ const VIPDashboard: React.FC = () => {
 
   // Tirer les stats en temps réel si l'API Electron est dispo, sinon fallback simulé
   useEffect(() => {
-    let timer: any
     const pull = async () => {
       try {
         const r = await (window as any).electronAPI?.getRealtimeAnalytics?.()
@@ -50,8 +49,8 @@ const VIPDashboard: React.FC = () => {
       }))
     }
     pull()
-    timer = setInterval(pull, 2000)
-    return () => timer && clearInterval(timer)
+    const timer = setInterval(pull, 2000)
+    return () => clearInterval(timer)
   }, [])
 
   useEffect(() => {
@@ -281,7 +280,7 @@ const VIPDashboard: React.FC = () => {
                   color: '#8B5CF6',
                   icon: BarChart3,
                 },
-              ].map((row, idx) => (
+              ].map((row) => (
                 <li key={row.label}>
                   <button
                     onClick={() => (window.location.href = row.href)}
