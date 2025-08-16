@@ -142,7 +142,9 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
     api.onUpdateProgress(onProg)
     api.onUpdateDownloaded(onDl)
     // Trigger silent check once on mount (prod)
-    api.updateCheck?.()
+    // Ne pas auto-check au démarrage pour éviter le bandeau d'erreur lorsque
+    // aucun release n'est publié. L'utilisateur peut cliquer sur "Vérifier".
+    // api.updateCheck?.()
     return () => {
       try {
         api.offUpdate('update:checking', onCheck)
@@ -280,7 +282,7 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
                 {updateState.status === 'downloading' &&
                   `Téléchargement… ${updateState.progress || 0}%`}
                 {updateState.status === 'downloaded' && 'Mise à jour téléchargée'}
-                {updateState.status === 'error' && `Erreur mise à jour: ${updateState.err}`}
+                {updateState.status === 'error' && 'Mise à jour non disponible'}
               </span>
               <div style={{ display: 'flex', gap: 8 }}>
                 {updateState.status === 'available' && (

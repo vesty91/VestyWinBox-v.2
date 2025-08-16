@@ -147,10 +147,12 @@ function createWindow() {
       }, 30)
     } else {
       // Vérifier les mises à jour en prod (best-effort)
+      // Désactivé par défaut si aucun release GitHub n'est publié pour éviter le toast d'erreur
       try {
         if (autoUpdater) {
           autoUpdater.autoDownload = false
-          autoUpdater.checkForUpdates().catch(() => {})
+          // Ne pas déclencher de check automatique pour éviter "No published versions on GitHub"
+          // L'utilisateur pourra lancer un check manuel via le menu/ UI.
         }
       } catch {}
     }
@@ -159,6 +161,14 @@ function createWindow() {
   // Brancher les événements d'auto‑update et relayer au renderer
   try {
     if (autoUpdater) {
+      const isNoPublishedError = (e) => {
+        try {
+          const msg = typeof e === 'string' ? e : e?.message || String(e)
+          return /No published versions on GitHub/i.test(msg)
+        } catch {
+          return false
+        }
+      }
       autoUpdater.on('checking-for-update', () => {
         try {
           mainWindow?.webContents.send('update:checking')
@@ -176,7 +186,12 @@ function createWindow() {
       })
       autoUpdater.on('error', (err) => {
         try {
-          mainWindow?.webContents.send('update:error', String(err))
+          if (isNoPublishedError(err)) {
+            // Considérer comme "pas de mise à jour" (silencieux)
+            mainWindow?.webContents.send('update:none', {})
+          } else {
+            mainWindow?.webContents.send('update:error', String(err))
+          }
         } catch {}
       })
       autoUpdater.on('download-progress', (p) => {

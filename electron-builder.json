@@ -2,10 +2,22 @@
   "appId": "com.vestywinbox.app",
   "productName": "VestyWinBox",
   "directories": {
-    "output": "release"
+    "output": "release-new"
   },
-  "files": ["dist/**/*", "electron/**/*", "assets/**/*", "node_modules/**/*", "package.json"],
-  "asarUnpack": ["assets/Apps portable/**/*"],
+  "files": [
+    "dist/**/*",
+    "electron/**/*",
+    "assets/icon.ico",
+    "assets/icons/**/*",
+    "assets/branding/**/*",
+    "assets/screens/**/*",
+    "!assets/Apps portable/**",
+    "!assets/logiciels/**",
+    "!assets/ffmpeg/**",
+    "node_modules/**/*",
+    "package.json"
+  ],
+  "asarUnpack": [],
   "icon": "assets/icon.ico",
   "win": {
     "target": "nsis",

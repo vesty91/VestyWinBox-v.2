@@ -13,7 +13,7 @@
     "format": "prettier -w .",
     "format:check": "prettier -c .",
     "electron": "set NODE_ENV=development && electron .",
-    "postbuild": "robocopy assets dist/assets /E /NFL /NDL /NJH /NJS /NC /NS /NP",
+    "postbuild": "robocopy assets\\icons dist\\assets\\icons /E /NFL /NDL /NJH /NJS /NC /NS /NP & robocopy assets\\branding dist\\assets\\branding /E /NFL /NDL /NJH /NJS /NC /NS /NP & robocopy assets\\screens dist\\assets\\screens /E /NFL /NDL /NJH /NJS /NC /NS /NP & copy /Y assets\\icon.ico dist\\assets\\icon.ico",
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:simple": "npm run dev & timeout 3 && electron .",
@@ -59,17 +59,22 @@
     "appId": "com.vestywinbox.app",
     "productName": "VestyWinBox",
     "directories": {
-      "output": "release"
+      "output": "release-new"
     },
+    "icon": "assets/icon.ico",
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "assets/**/*",
+      "assets/icon.ico",
+      "assets/icons/**/*",
+      "assets/branding/**/*",
+      "assets/screens/**/*",
+      "!assets/Apps portable/**",
+      "!assets/logiciels/**",
+      "!assets/ffmpeg/**",
       "node_modules/**/*"
     ],
-    "asarUnpack": [
-      "assets/Apps portable/**/*"
-    ],
+    "asarUnpack": [],
     "win": {
       "target": "nsis"
     },
