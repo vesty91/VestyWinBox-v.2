@@ -451,6 +451,17 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               {/* Toggle langue retiré: FR uniquement */}
 
+              {/* Vérifier les mises à jour (toujours visible si API dispo) */}
+              <Button
+                onClick={() => (window as any).electronAPI?.updateCheck?.()}
+                ariaLabel="Vérifier les mises à jour"
+                variant="outline"
+                style={{ padding: '8px 12px' }}
+                title="Vérifier les mises à jour"
+              >
+                Vérifier maj
+              </Button>
+
               <Button
                 onClick={toggleSidebar}
                 ariaLabel="Menu de navigation"

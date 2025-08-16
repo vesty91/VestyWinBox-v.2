@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, shell, dialog, Menu } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const { exec, spawn } = require('child_process')
@@ -35,6 +35,36 @@ function showNotification(title, body, options = {}) {
     }
   }
   return null
+}
+
+function buildAppMenu() {
+  try {
+    const template = [
+      { role: 'fileMenu' },
+      { role: 'editMenu' },
+      { role: 'viewMenu' },
+      { role: 'windowMenu' },
+      {
+        role: 'help',
+        submenu: [
+          {
+            label: 'Vérifier les mises à jour',
+            accelerator: 'Ctrl+U',
+            click: () => {
+              try {
+                if (autoUpdater) {
+                  autoUpdater.autoDownload = false
+                  autoUpdater.checkForUpdates().catch(() => {})
+                }
+              } catch {}
+            },
+          },
+        ],
+      },
+    ]
+    const menu = Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu)
+  } catch {}
 }
 
 function createWindow() {
@@ -158,6 +188,8 @@ function createWindow() {
     }
   })
 
+  // Menu application est construit globalement
+
   // Brancher les événements d'auto‑update et relayer au renderer
   try {
     if (autoUpdater) {
@@ -271,7 +303,10 @@ function getPortableAppsPath() {
 }
 
 // Cette méthode sera appelée quand Electron aura fini l'initialisation
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  buildAppMenu()
+  createWindow()
+})
 
 // Quitter quand toutes les fenêtres sont fermées
 app.on('window-all-closed', () => {

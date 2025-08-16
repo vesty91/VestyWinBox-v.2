@@ -113,6 +113,14 @@ const VIPDashboard: React.FC = () => {
               &nbsp;Paramètres
             </Button>
             <Button
+              variant="outline"
+              onClick={() => (window as any).electronAPI?.updateCheck?.()}
+              title="Vérifier les mises à jour"
+            >
+              <RefreshCw size={16} />
+              &nbsp;Vérifier maj
+            </Button>
+            <Button
               variant="ghost"
               onClick={() => (window.location.hash = '#/software')}
               style={{
