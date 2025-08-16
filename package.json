@@ -59,7 +59,7 @@
     "appId": "com.vestywinbox.app",
     "productName": "VestyWinBox",
     "directories": {
-      "output": "release-new"
+      "output": "release-build"
     },
     "icon": "assets/icon.ico",
     "files": [
