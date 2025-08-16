@@ -106,7 +106,7 @@ const VIPDashboard: React.FC = () => {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <Button
               variant="outline"
-              onClick={() => (window.location.href = '/settings')}
+              onClick={() => (window.location.hash = '#/settings')}
               title="Paramètres"
             >
               <Settings size={16} />
@@ -114,7 +114,7 @@ const VIPDashboard: React.FC = () => {
             </Button>
             <Button
               variant="ghost"
-              onClick={() => (window.location.href = '/software')}
+              onClick={() => (window.location.hash = '#/software')}
               style={{
                 background: 'linear-gradient(135deg,#3B82F6 0%, #2563EB 100%)',
                 border: 'none',
@@ -125,7 +125,7 @@ const VIPDashboard: React.FC = () => {
             </Button>
             <Button
               variant="ghost"
-              onClick={() => (window.location.href = '/portable-apps')}
+              onClick={() => (window.location.hash = '#/portable-apps')}
               style={{
                 background: 'linear-gradient(135deg,#10B981 0%, #059669 100%)',
                 border: 'none',
@@ -136,7 +136,7 @@ const VIPDashboard: React.FC = () => {
             </Button>
             <Button
               variant="ghost"
-              onClick={() => (window.location.href = '/file-converter')}
+              onClick={() => (window.location.hash = '#/file-converter')}
               style={{
                 background: 'linear-gradient(135deg,#F59E0B 0%, #D97706 100%)',
                 border: 'none',
@@ -147,7 +147,7 @@ const VIPDashboard: React.FC = () => {
             </Button>
             <Button
               variant="ghost"
-              onClick={() => (window.location.href = '/analytics')}
+              onClick={() => (window.location.hash = '#/analytics')}
               style={{
                 background: 'linear-gradient(135deg,#8B5CF6 0%, #7C3AED 100%)',
                 border: 'none',
@@ -283,7 +283,7 @@ const VIPDashboard: React.FC = () => {
               ].map((row) => (
                 <li key={row.label}>
                   <button
-                    onClick={() => (window.location.href = row.href)}
+                    onClick={() => (window.location.hash = `#${row.href}`)}
                     style={{
                       width: '100%',
                       textAlign: 'left',
@@ -354,13 +354,13 @@ const VIPDashboard: React.FC = () => {
           <div style={{ ...surface.muted, padding: 16 }}>
             <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800 }}>Raccourcis utiles</h3>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
-              <Button variant="outline" onClick={() => (window.location.href = '/god-mode')}>
+              <Button variant="outline" onClick={() => (window.location.hash = '#/god-mode')}>
                 God Mode
               </Button>
-              <Button variant="outline" onClick={() => (window.location.href = '/chocolatey')}>
+              <Button variant="outline" onClick={() => (window.location.hash = '#/chocolatey')}>
                 Chocolatey
               </Button>
-              <Button variant="outline" onClick={() => (window.location.href = '/nas-explorer')}>
+              <Button variant="outline" onClick={() => (window.location.hash = '#/nas-explorer')}>
                 NAS
               </Button>
             </div>
