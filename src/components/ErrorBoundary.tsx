@@ -1,4 +1,4 @@
-import { AlertTriangle, Home, RefreshCw } from 'lucide-react'
+import { AlertTriangle, Home } from 'lucide-react'
 import { Component, ErrorInfo, ReactNode } from 'react'
 import { surface } from '../ui/styles/tokens'
 
@@ -164,7 +164,7 @@ class ErrorBoundary extends Component<Props, State> {
                   e.currentTarget.style.boxShadow = 'none'
                 }}
               >
-                <RefreshCw size={16} />
+                <span aria-hidden>↻</span>
                 Recharger
               </button>
 

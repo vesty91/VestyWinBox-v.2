@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Download, Package, RefreshCw, Search, X } from 'lucide-react'
+import { Download, Package, Search, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import UnifiedTile from '../../components/UnifiedTile/UnifiedTile'
 import { t } from '../../i18n'
@@ -93,7 +93,7 @@ const SoftwarePage: React.FC = () => {
     if (installingSoftware.includes(tool.id)) {
       return {
         text: 'Lancement...',
-        icon: RefreshCw,
+        icon: () => <span aria-hidden>↻</span>,
         action: () => {},
         status: 'installing' as const,
       }
@@ -125,7 +125,7 @@ const SoftwarePage: React.FC = () => {
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         >
-          <RefreshCw size={48} color="#FFD700" />
+          <span aria-hidden style={{ fontSize: 48 }}>↻</span>
         </motion.div>
       </div>
     )
@@ -287,7 +287,7 @@ const SoftwarePage: React.FC = () => {
             e.currentTarget.style.transform = 'scale(1)'
           }}
         >
-          <RefreshCw size={20} />
+          <span aria-hidden>↻</span>
           {t('refresh') || 'Actualiser'}
         </button>
       </motion.div>

@@ -777,7 +777,7 @@ const PortableAppsPage: React.FC = () => {
     if (launchingApps.includes(app.id)) {
       return {
         text: 'Lancement...',
-        icon: () => <span style={{display:'inline-block',transform:'rotate(0deg)'}}>↻</span>,
+        icon: () => <span style={{ display: 'inline-block', transform: 'rotate(0deg)' }}>↻</span>,
         action: () => {},
         status: 'installing' as const,
       }
@@ -806,7 +806,7 @@ const PortableAppsPage: React.FC = () => {
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         >
-          <RefreshCw size={48} color="#10B981" />
+          <span aria-hidden style={{ fontSize: 48 }}>↻</span>
         </motion.div>
       </div>
     )
@@ -1096,7 +1096,7 @@ const PortableAppsPage: React.FC = () => {
             e.currentTarget.style.transform = 'scale(1)'
           }}
         >
-          <RefreshCw size={20} />
+          <span aria-hidden>↻</span>
           {t('refresh') || 'Actualiser'}
         </button>
       </motion.div>

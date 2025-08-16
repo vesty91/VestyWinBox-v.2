@@ -9,7 +9,6 @@ import {
   Info,
   ListChecks,
   Package,
-  RefreshCw,
   Search,
   Shield,
   Terminal,
@@ -1031,7 +1030,7 @@ const ChocolateyPage: React.FC = () => {
                             background: 'linear-gradient(135deg,#3B82F6 0%, #2563EB 100%)',
                             border: 'none',
                           }}
-                          leftIcon={<RefreshCw size={16} />}
+                          leftIcon={<span aria-hidden>↻</span>}
                         >
                           {t('update_all') || 'Tout MAJ'} ({outdated.length})
                         </Button>
@@ -1107,7 +1106,7 @@ const ChocolateyPage: React.FC = () => {
                                     background: 'linear-gradient(135deg,#3B82F6 0%, #2563EB 100%)',
                                     border: 'none',
                                   }}
-                                  leftIcon={<RefreshCw size={16} />}
+                                  leftIcon={<span aria-hidden>↻</span>}
                                 >
                                   {t('update') || 'Mettre à jour'}
                                 </Button>
@@ -1155,7 +1154,7 @@ const ChocolateyPage: React.FC = () => {
                           background: 'linear-gradient(135deg,#3B82F6 0%, #2563EB 100%)',
                           border: 'none',
                         }}
-                        leftIcon={<RefreshCw size={16} />}
+                        leftIcon={<span aria-hidden>↻</span>}
                       >
                         {t('update_all') || 'Tout mettre à jour'} ({outdated.length})
                       </Button>
@@ -1194,7 +1193,7 @@ const ChocolateyPage: React.FC = () => {
                             background: 'linear-gradient(135deg,#3B82F6 0%, #2563EB 100%)',
                             border: 'none',
                           }}
-                          leftIcon={<RefreshCw size={16} />}
+                          leftIcon={<span aria-hidden>↻</span>}
                         >
                           {t('update') || 'Mettre à jour'}
                         </Button>
