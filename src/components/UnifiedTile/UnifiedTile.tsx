@@ -42,7 +42,9 @@ const UnifiedTile: React.FC<UnifiedTileProps> = ({
     p = p.replace(/^(assets\/)?assets\//, 'assets/')
     // Build absolute file URL: file:///C:/.../resources/dist/ + assets/...
     try {
-      const pathname = window.location.pathname.replace(/\\/g, '/')</n+      const distDir = pathname.replace(/\/index\.html.*$/i, '/')</n+      return `file://${distDir}${p}`
+      const pathname = window.location.pathname.replace(/\\/g, '/')
+      const distDir = pathname.replace(/\/index\.html.*$/i, '/')
+      return `file://${distDir}${p}`
     } catch {
       return p
     }
