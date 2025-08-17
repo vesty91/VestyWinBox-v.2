@@ -12,7 +12,7 @@ import {
   Sparkles,
   X,
 } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Button from '../../ui/components/Button'
 import './VIPLayout.css'
@@ -217,8 +217,27 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
   // Layout constants
   const HEADER_H = 64
   const bannerVisible = updateState.status !== 'idle' && updateState.status !== 'none'
-  const BANNER_H = bannerVisible ? 48 : 0
-  const TOP_OFFSET = HEADER_H + (bannerVisible ? BANNER_H + 8 : 0)
+  const bannerRef = useRef<HTMLDivElement | null>(null)
+  const [bannerHeight, setBannerHeight] = useState<number>(0)
+  useEffect(() => {
+    if (!bannerVisible) {
+      setBannerHeight(0)
+      return
+    }
+    const el = bannerRef.current as any
+    if (!el) return
+    const update = () => setBannerHeight((el.offsetHeight || 0) + 8)
+    update()
+    try {
+      const RO: any = (window as any).ResizeObserver
+      if (RO) {
+        const ro = new RO(() => update())
+        ro.observe(el)
+        return () => ro.disconnect()
+      }
+    } catch {}
+  }, [bannerVisible])
+  const TOP_OFFSET = HEADER_H + (bannerVisible ? bannerHeight : 0)
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
   const toggleLockSidebar = () => {
@@ -272,6 +291,7 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
             }}
           >
             <div
+              ref={bannerRef as any}
               style={{
                 ...surface.muted,
                 pointerEvents: 'auto',
