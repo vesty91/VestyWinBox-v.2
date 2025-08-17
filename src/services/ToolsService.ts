@@ -34,6 +34,17 @@ class ToolsService {
     this.initializeData()
   }
 
+  private static normalizeAssetPath(p: string | undefined): string | undefined {
+    if (!p) return p
+    if (p.startsWith('file://')) return p
+    // ensure starts with assets/ without leading slash and encode URI components after assets/
+    const trimmed = p.replace(/^\/+/, '').replace(/^assets\//, '').replace(/\\/g, '/').replace(/\s+/g, ' ')
+    // split and encode each segment except file scheme
+    const parts = trimmed.split('/')
+    const encoded = parts.map((seg) => encodeURIComponent(seg)).join('/')
+    return `assets/${encoded}`
+  }
+
   private initializeData() {
     // Initialisation des catégories
     this.categories = [
@@ -1064,10 +1075,14 @@ class ToolsService {
     return this.portableRootDir
   }
 
+  // Hook: post process icon paths when returning lists
+  private mapNormalizeIcons<T extends Tool>(arr: T[]): T[] {
+    return arr.map((t) => ({ ...t, iconPath: ToolsService.normalizeAssetPath(t.iconPath) }))
+  }
+
   // Méthodes principales
   async scanLogiciels(): Promise<Tool[]> {
     try {
-      // Simulation d'un scan des logiciels installés
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       // Vérification des logiciels installés via Electron API
@@ -1084,10 +1099,10 @@ class ToolsService {
         })
       }
 
-      return this.softwareList
+      return this.mapNormalizeIcons(this.softwareList)
     } catch (error) {
       console.error('Erreur lors du scan des logiciels:', error)
-      return this.softwareList
+      return this.mapNormalizeIcons(this.softwareList)
     }
   }
 
@@ -1126,10 +1141,10 @@ class ToolsService {
         })
       }
 
-      return this.portableAppsList
+      return this.mapNormalizeIcons(this.portableAppsList)
     } catch (error) {
       console.error('Erreur lors du scan des apps portables:', error)
-      return this.portableAppsList
+      return this.mapNormalizeIcons(this.portableAppsList)
     }
   }
 

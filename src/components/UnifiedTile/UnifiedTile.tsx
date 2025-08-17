@@ -30,6 +30,18 @@ const UnifiedTile: React.FC<UnifiedTileProps> = ({
   index = 0,
   iconPath,
 }) => {
+  // Normalize icon source for packaged Electron app:
+  // - keep absolute file:// URLs
+  // - remove any leading slash so '/assets/..' becomes 'assets/..' (relative to dist/index.html)
+  // - collapse duplicate 'assets/assets' if it occurs
+  const resolvedIconSrc = React.useMemo(() => {
+    if (!iconPath) return undefined
+    if (iconPath.startsWith('file://')) return iconPath
+    let p = iconPath.replace(/^\/+/, '')
+    p = p.replace(/\/+/g, '/')
+    p = p.replace(/^(assets\/)?assets\//, 'assets/')
+    return p
+  }, [iconPath])
   const getStatusText = () => {
     switch (status) {
       case 'available':
@@ -109,9 +121,9 @@ const UnifiedTile: React.FC<UnifiedTileProps> = ({
             flexShrink: 0,
           }}
         >
-          {iconPath ? (
+          {resolvedIconSrc ? (
             <img
-              src={iconPath}
+              src={resolvedIconSrc}
               alt={title}
               style={{ width: '36px', height: '36px', objectFit: 'contain' }}
             />
