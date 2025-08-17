@@ -214,6 +214,12 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
       day: 'numeric',
     })
 
+  // Layout constants
+  const HEADER_H = 64
+  const bannerVisible = updateState.status !== 'idle' && updateState.status !== 'none'
+  const BANNER_H = bannerVisible ? 48 : 0
+  const TOP_OFFSET = HEADER_H + (bannerVisible ? BANNER_H + 8 : 0)
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
   const toggleLockSidebar = () => {
     const next = !lockSidebar
@@ -252,11 +258,11 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
         />
 
         {/* Bannière de mise à jour */}
-        {updateState.status !== 'idle' && updateState.status !== 'none' && (
+        {bannerVisible && (
           <div
             style={{
               position: 'fixed',
-              top: 64,
+              top: HEADER_H,
               left: isSidebarOpen || lockSidebar ? 280 : 0,
               right: 0,
               zIndex: 1000,
@@ -492,7 +498,7 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
                 backdropFilter: 'blur(20px)',
                 borderRight: '1px solid var(--border)',
                 zIndex: 999,
-                paddingTop: '64px',
+                paddingTop: `${TOP_OFFSET}px`,
               }}
             >
               <nav style={{ padding: '24px' }}>
@@ -591,8 +597,8 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
         {/* Contenu principal */}
         <main
           style={{
-            paddingTop: '64px',
-            minHeight: 'calc(100vh - 64px)',
+            paddingTop: `${TOP_OFFSET}px`,
+            minHeight: `calc(100vh - ${TOP_OFFSET}px)`,
             paddingLeft: isSidebarOpen || lockSidebar ? '280px' : '0',
             transition: 'padding-left 0.3s ease',
             position: 'relative',
