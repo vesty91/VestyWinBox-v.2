@@ -1,6 +1,6 @@
-import React from 'react'
 import { motion } from 'framer-motion'
-import { LucideIcon, Info, Play, ShieldAlert } from 'lucide-react'
+import { Info, LucideIcon, Play, ShieldAlert } from 'lucide-react'
+import React from 'react'
 import './UnifiedTile.css'
 
 export interface UnifiedTileProps {
@@ -40,7 +40,13 @@ const UnifiedTile: React.FC<UnifiedTileProps> = ({
     let p = iconPath.replace(/^\/+/, '')
     p = p.replace(/\/+/g, '/')
     p = p.replace(/^(assets\/)?assets\//, 'assets/')
-    return p
+    try {
+      // Build absolute URL relative to current page (dist/index.html)
+      const u = new URL(p, window.location.href)
+      return u.href
+    } catch {
+      return p
+    }
   }, [iconPath])
   const getStatusText = () => {
     switch (status) {
