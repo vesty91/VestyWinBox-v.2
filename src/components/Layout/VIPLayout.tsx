@@ -256,7 +256,7 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
           <div
             style={{
               position: 'fixed',
-              top: 80,
+              top: 64,
               left: isSidebarOpen || lockSidebar ? 280 : 0,
               right: 0,
               zIndex: 1000,
@@ -339,7 +339,7 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
             background: 'var(--header-bg)',
             backdropFilter: 'blur(20px)',
             borderBottom: '1px solid var(--border)',
-            padding: '16px 24px',
+            padding: '12px 20px',
           }}
         >
           <div
@@ -358,9 +358,9 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
             >
               <div
                 style={{
-                  width: '72px',
-                  height: '72px',
-                  borderRadius: '18px',
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '14px',
                   background: 'var(--tile-bg)',
                   border: '1px solid var(--border-soft)',
                   display: 'flex',
@@ -370,7 +370,7 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
                   overflow: 'hidden',
                 }}
               >
-                <currentNavItem.icon size={36} color="var(--icon)" />
+                <currentNavItem.icon size={28} color="var(--icon)" />
                 <motion.div
                   style={{
                     position: 'absolute',
@@ -492,7 +492,7 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
                 backdropFilter: 'blur(20px)',
                 borderRight: '1px solid var(--border)',
                 zIndex: 999,
-                paddingTop: '80px',
+                paddingTop: '64px',
               }}
             >
               <nav style={{ padding: '24px' }}>
@@ -591,8 +591,8 @@ const VIPLayout: React.FC<VIPLayoutProps> = ({ children }) => {
         {/* Contenu principal */}
         <main
           style={{
-            paddingTop: '80px',
-            minHeight: 'calc(100vh - 80px)',
+            paddingTop: '64px',
+            minHeight: 'calc(100vh - 64px)',
             paddingLeft: isSidebarOpen || lockSidebar ? '280px' : '0',
             transition: 'padding-left 0.3s ease',
             position: 'relative',
