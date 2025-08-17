@@ -34,5 +34,12 @@
     "deleteAppDataOnUninstall": false,
     "artifactName": "${productName} Setup ${version}.exe",
     "uninstallDisplayName": "VestyWinBox"
-  }
+  },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "vesty91",
+      "repo": "VestyWinBox-v.2"
+    }
+  ]
 }

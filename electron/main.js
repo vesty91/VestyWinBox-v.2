@@ -2919,6 +2919,8 @@ function sanitizeProcessName(name) {
 ipcMain.handle('updateCheck', async () => {
   try {
     if (!autoUpdater) return { ok: false, message: 'autoUpdater indisponible' }
+    try { mainWindow?.webContents.send('update:checking') } catch {}
+    autoUpdater.autoDownload = false
     const res = await autoUpdater.checkForUpdates()
     return { ok: true, data: !!res?.updateInfo }
   } catch (e) {
