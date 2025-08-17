@@ -40,10 +40,11 @@ const UnifiedTile: React.FC<UnifiedTileProps> = ({
     let p = iconPath.replace(/^\/+/, '')
     p = p.replace(/\/+/g, '/')
     p = p.replace(/^(assets\/)?assets\//, 'assets/')
+    // Build absolute file URL: distDir + assets/...
     try {
-      // Build absolute URL relative to current page (dist/index.html)
-      const u = new URL(p, window.location.href)
-      return u.href
+      const href = window.location.href
+      const distDir = href.replace(/index\.html[^]*$/i, '')
+      return distDir + p
     } catch {
       return p
     }
